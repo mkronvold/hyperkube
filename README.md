@@ -35,8 +35,10 @@ You have to Start Powershell as administartor and run command `set-executionpoli
 - https://github.com/youurayy/hyperctl
 
 # From howto video
+
 ✅Hyper-V server:
 - Generate SSH Public key: ssh-keygen
+
 ✅Windows client:
 - Go to Window Admin Center  download public ssh key and save to `$Home\.ssh`
 - Download and setup Qemu-Img
@@ -45,6 +47,7 @@ You have to Start Powershell as administartor and run command `set-executionpoli
 - Run: .\hyperv-k8s.ps1 Get-Image
 - Run: .\hyperv-k8s.ps1 Save-ISOMaster
 - Run: .\hyperv-k8s.ps1 Save-ISONode1
+
 ✅Windows Admin center:
 - Upload created isos (on Windows client) to `C:\Users\Administrator\Documents\isos`
 - Upload hyperv-k8s.ps1 to `C:\Users\Administrator\Documents`
