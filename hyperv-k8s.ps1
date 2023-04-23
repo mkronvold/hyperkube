@@ -1,5 +1,5 @@
 $version = 'v1.0.3'
-$workdir = "$HOME\Documents"
+$workdir = "$HOME\hyperkube"
 # $guestuser = $env:USERNAME.ToLower()
 $guestuser = 'administrator'
 $sshpath = "$HOME\.ssh\id_rsa.pub"
