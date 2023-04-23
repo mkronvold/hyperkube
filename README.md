@@ -33,3 +33,29 @@ You have to Start Powershell as administartor and run command `set-executionpoli
 
 # Refereces
 - https://github.com/youurayy/hyperctl
+
+# From howto video
+✅Hyper-V server:
+- Generate SSH Public key: ssh-keygen
+✅Windows client:
+- Go to Window Admin Center  download public ssh key and save to `$Home\.ssh`
+- Download and setup Qemu-Img
+- Download my PowserShell scripts hyperv-k8s.ps1
+- Run PowerShell as Admin and cd to folder having hyperv-k8s.ps1
+- Run: .\hyperv-k8s.ps1 Get-Image
+- Run: .\hyperv-k8s.ps1 Save-ISOMaster
+- Run: .\hyperv-k8s.ps1 Save-ISONode1
+✅Windows Admin center:
+- Upload created isos (on Windows client) to `C:\Users\Administrator\Documents\isos`
+- Upload hyperv-k8s.ps1 to `C:\Users\Administrator\Documents`
+- Open PowersShell: 
+- Run: .\hyperv-k8s.ps1 Install-Tools
+- Run: .\hyperv-k8s.ps1 Deploy-HostsFile
+- Run: .\hyperv-k8s.ps1 Deploy-Network
+- Run: .\hyperv-k8s.ps1 Get-Image
+- Run: .\hyperv-k8s.ps1 Deploy-Master
+- Run: .\hyperv-k8s.ps1 Deploy-Node1
+- Run: .\hyperv-k8s.ps1 Initialize-Kubeadm
+- Run: .\hyperv-k8s.ps1 Start-KubeadmJoin
+- Run: .\hyperv-k8s.ps1 Save-KubeConfig
+
