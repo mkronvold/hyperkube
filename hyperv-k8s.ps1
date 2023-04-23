@@ -399,6 +399,7 @@ function New-VHDXTmpl($imageurl, $srcimg, $vhdxtmpl) {
   }
 
   if (!(Test-Path $vhdxtmpl)) {
+    Write-Output "vhdxtmpl: $vhdxtmpl"
     qemu-img.exe convert $srcimg -O vhdx -o subformat=dynamic $vhdxtmpl
   }
 
