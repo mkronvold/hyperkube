@@ -38,7 +38,7 @@ switch ($config) {
 $nettype = 'private' # private/public
 $zwitch = 'K8s' # private or public switch name
 $natnet = 'KubeNatNet' # private net nat net name (privnet only)
-$adapter = 'Wi-Fi' # public net adapter name (pubnet only)
+$adapter = 'Ethernet' # public net adapter name (pubnet only)
 
 $cpus = 2
 $ram = '2GB'
