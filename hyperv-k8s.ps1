@@ -75,7 +75,7 @@ $kubepackages = @"
   - [ kubectl, $kubeversion ]
 "@
 
-$cni = 'flannel'
+$cni = 'calico'
 
 switch ($cni) {
   'flannel' {
@@ -266,13 +266,13 @@ function New-PrivateNet($natnet, $zwitch, $cblock) {
 
 function Write-YamlContents($path, $cblock) {
   Set-Content $path ([byte[]][char[]] `
-      "$(&"get-userdata$distro" -cblock $cblock)`n") -encoding byte
+      "$(&"get-userdata$distro" -cblock $cblock)`n") -AsByteStream -Raw
 }
 
 function Write-ISOContents($vmname, $cblock, $ip) {
   mkdir $workdir\$vmname\cidata -ea 0 | Out-Null
   Set-Content $workdir\$vmname\cidata\meta-data ([byte[]][char[]] `
-      "$(Get-Metadata -vmname $vmname -cblock $cblock -ip $ip)") -encoding byte
+      "$(Get-Metadata -vmname $vmname -cblock $cblock -ip $ip)") -AsByteStream -Raw
   Write-YamlContents -path $workdir\$vmname\cidata\user-data -cblock $cblock
 }
 
