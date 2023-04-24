@@ -66,7 +66,7 @@ $macs = @(
 # https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/repodata/filelists.xml
 # https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages
 # ctrl+f "kubeadm"
-$kubeversion = '1.22.1-00'
+$kubeversion = '1.27.1-00'
 
 $kubepackages = @"
   - docker-ce
