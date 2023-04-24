@@ -66,7 +66,7 @@ $macs = @(
 # https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/repodata/filelists.xml
 # https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages
 # ctrl+f "kubeadm"
-$kubeversion = '1.27.1-00'
+$kubeversion = '1.22.1-00'
 
 $kubepackages = @"
   - docker-ce
@@ -74,6 +74,11 @@ $kubepackages = @"
   - [ kubeadm, $kubeversion ]
   - [ kubectl, $kubeversion ]
 "@
+
+# downloads
+$dockercli  = 'https://github.com/StefanScherer/docker-cli-builder/releases/download/20.10.9/docker.exe'
+$kubectlcli = 'https://dl.k8s.io/release/v1.22.0/bin/windows/amd64/kubectl.exe'
+$qemuimgcli = 'https://cloudbase.it/downloads/qemu-img-win-x64-2_3_0.zip'
 
 $cni = 'calico'
 
@@ -94,13 +99,16 @@ switch ($cni) {
 
 $sshopts = @('-o LogLevel=ERROR', '-o StrictHostKeyChecking=no', '-o UserKnownHostsFile=/dev/null')
 
-$dockercli = 'https://github.com/StefanScherer/docker-cli-builder/releases/download/20.10.9/docker.exe'
+
 
 # ----------------------------------------------------------------------
 
 $imageurl = "$imagebase/$image$archive"
-$srcimg = "$workdir\$image"
+$srcimg   = "$workdir\$image"
 $vhdxtmpl = "$workdir\$($image -replace '^(.+)\.[^.]+$', '$1').vhdx"
+
+$toolsdir = "$workdir\tools"
+$toolsbin = "$toolsdir\bin"
 
 
 # switch to the script directory
@@ -591,31 +599,28 @@ switch -regex ($args) {
 "@
   }
   ^Install-Tools$ {
-    # Install qemu-img
-    if (Test-Path 'C:\qemu-img') {
-      Remove-Item 'C:\qemu-img' -Force -Recurse
+#      Remove-Item $toolsdir -Force -Recurse
+    if (!(Test-Path $toolsdir)) {
+      New-Item -Path $workdir -Name "tools" -ItemType "directory"
     }
-    Invoke-WebRequest -Uri 'https://cloudbase.it/downloads/qemu-img-win-x64-2_3_0.zip' -OutFile 'C:\qemu-img.zip'
-    Expand-Archive -LiteralPath 'C:\qemu-img.zip' -DestinationPath C:\qemu-img
-    Remove-Item 'C:\qemu-img.zip'
+    if (!(Test-Path $toolsbin)) {
+      New-Item -Path $workdir\tools -Name "bin" -ItemType "directory"      
+    }
+
+    # Install qemu-img
+    Invoke-WebRequest -Uri "$qemuimgcli" -OutFile "$toolsdir\qemu-img.zip"
+    Expand-Archive -LiteralPath "$workdir\qemu-img.zip" -DestinationPath "$toolsbin"
+    Remove-Item "$toolsdir\qemu-img.zip"
 
     # Install kubectl
-    if (Test-Path 'C:\kubectl') {
-      Remove-Item 'C:\kubectl' -Force -Recurse
-    }
-    New-Item -Path "C:\" -Name "kubectl" -ItemType "directory"
-    Invoke-WebRequest -Uri 'https://dl.k8s.io/release/v1.22.0/bin/windows/amd64/kubectl.exe' -OutFile 'c:\kubectl\kubectl.exe'
+    Invoke-WebRequest -Uri "$kubectlcli" -OutFile "$toolsbin\kubectl.exe"
 
     # Install docker cli
-    if (Test-Path 'C:\docker') {
-      Remove-Item 'C:\docker' -Force -Recurse
-    }
-    New-Item -Path "C:\" -Name "docker" -ItemType "directory"
-    Invoke-WebRequest -Uri 'https://github.com/StefanScherer/docker-cli-builder/releases/download/20.10.5/docker.exe' -OutFile 'c:\docker\docker.exe'
+    Invoke-WebRequest -Uri "$dockercli" -OutFile "$toolsbin\docker.exe"
 
     # Add to PATH    
     $oldPath = (Get-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH).Path
-    $newPath = "$oldPath;C:\kubectl;C:\git\bin;C:\docker;C:\qemu-img"    
+    $newPath = "$oldPath;$toolsbin"    
     Set-ItemProperty -Path 'Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\Environment' -Name PATH -Value $newPath
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
   }
