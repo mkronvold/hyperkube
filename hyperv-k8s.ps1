@@ -94,7 +94,7 @@ switch ($cni) {
 
 $sshopts = @('-o LogLevel=ERROR', '-o StrictHostKeyChecking=no', '-o UserKnownHostsFile=/dev/null')
 
-$dockercli = 'https://github.com/StefanScherer/docker-cli-builder/releases/download/20.10.5/docker.exe'
+$dockercli = 'https://github.com/StefanScherer/docker-cli-builder/releases/download/20.10.9/docker.exe'
 
 # ----------------------------------------------------------------------
 
