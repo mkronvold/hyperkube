@@ -259,14 +259,23 @@ runcmd:
   - |
     echo "sudo tail -f /var/log/syslog" > /home/$guestuser/log
     systemctl mask --now systemd-timesyncd
-    systemctl enable --now chrony
-    systemctl stop kubelet
     cat /tmp/append-etc-hosts >> /etc/hosts
+    apt-get install -y apt-transport-https ca-certificates curl
+    chmod 755 /etc/apt/keyrings
+    mkdir -p /etc/apt/keyrings
+    curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
+    apt-get update
+    systemctl stop kubelet
+    apt install -y nfs-common chrony
+    systemctl enable --now chrony
+    apt-get install -y kubelet kubeadm kubectl
+    apt-mark hold kubelet kubeadm kubectl
     mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
     chmod o+r /lib/systemd/system/kubelet.service
     chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     # https://github.com/kubernetes/kubeadm/issues/954
-    apt-mark hold kubeadm kubelet kubectl
+    apt install -y linux-tools-virtual linux-cloud-tools-virtual
     touch /home/$guestuser/.init-completed
     EOF
 
