@@ -234,6 +234,8 @@ apt:
       keyserver: "hkp://keyserver.ubuntu.com:80"
       keyid: 0EBFCD88
 
+package_update: true
+
 package_upgrade: true
 
 packages:
@@ -243,22 +245,30 @@ packages:
   - chrony
 $kubepackages
 
+# Capture all subprocess output into a logfile
+# Useful for troubleshooting cloud-init issues
+output: {all: '| tee -a /var/log/cloud-init-output.log'}
+
 runcmd:
-  - echo "sudo tail -f /var/log/syslog" > /home/$guestuser/log
-  - systemctl mask --now systemd-timesyncd
-  - systemctl enable --now chrony
-  - systemctl stop kubelet
-  - cat /tmp/append-etc-hosts >> /etc/hosts
-  - mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
-  - chmod o+r /lib/systemd/system/kubelet.service
-  - chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-  # https://github.com/kubernetes/kubeadm/issues/954
-  - apt-mark hold kubeadm kubelet kubectl
-  - touch /home/$guestuser/.init-completed
+  - [ touch, "/home/$guestuser/.init-started" ]
+  - |
+    echo "sudo tail -f /var/log/syslog" > /home/$guestuser/log
+    systemctl mask --now systemd-timesyncd
+    systemctl enable --now chrony
+    systemctl stop kubelet
+    cat /tmp/append-etc-hosts >> /etc/hosts
+    mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
+    chmod o+r /lib/systemd/system/kubelet.service
+    chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    # https://github.com/kubernetes/kubeadm/issues/954
+    apt-mark hold kubeadm kubelet kubectl
+    touch /home/$guestuser/.init-completed
+    EOF
 
 power_state:
   timeout: 300
   mode: reboot
+  confirmation: true
 "@
 }
 
