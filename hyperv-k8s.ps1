@@ -372,8 +372,8 @@ function Write-ISO($zwitch, $vmname, $cpus, $mem, $hdd, $vhdxtmpl, $cblock, $ip,
 }
 
 function Remove-Machine($name) {
-  Stop-VM $name -turnoff -confirm:$false -ea silentlycontinue
-  Remove-VM $name -force -ea silentlycontinue
+  Stop-VM $name -turnoff -confirm:$false -ea inquire # silentlycontinue
+  Remove-VM $name -force -ea inquire # silentlycontinue
   Remove-Item -recurse -force $workdir\$name
 }
 
