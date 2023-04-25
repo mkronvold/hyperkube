@@ -280,7 +280,7 @@ function Write-YamlContents($path, $cblock) {
 function Write-ISOContents($vmname, $cblock, $ip) {
   mkdir $workdir\$vmname\cidata -ea 0 | Out-Null
   Set-Content $workdir\$vmname\cidata\meta-data ([byte[]][char[]] `
-      "$(Get-Metadata -vmname $vmname -cblock $cblock -ip $ip)") -AsByteStream -Raw
+      "$(Get-Metadata -vmname $vmname -cblock $cblock -ip $ip)") -AsByteStream
   Write-YamlContents -path $workdir\$vmname\cidata\user-data -cblock $cblock
 }
 
