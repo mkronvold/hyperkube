@@ -274,7 +274,7 @@ function New-PrivateNet($natnet, $zwitch, $cblock) {
 
 function Write-YamlContents($path, $cblock) {
   Set-Content $path ([byte[]][char[]] `
-      "$(&"get-userdata$distro" -cblock $cblock)`n") -AsByteStream -Raw
+      "$(&"get-userdata$distro" -cblock $cblock)`n") -AsByteStream
 }
 
 function Write-ISOContents($vmname, $cblock, $ip) {
