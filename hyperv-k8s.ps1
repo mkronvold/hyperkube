@@ -156,13 +156,11 @@ groups:
 
 users:
   - name: $guestuser
+    groups: sudo, docker
+    shell: /bin/bash
     ssh_authorized_keys:
       - $($sshpub)
-    sudo: [ 'ALL=(ALL) NOPASSWD:ALL' ]
-    groups: [ sudo, docker ]
-    shell: /bin/bash
-    # lock_passwd: false # passwd won't work without this
-    # passwd: '`$6`$rounds=4096`$byY3nxArmvpvOrpV`$2M4C8fh3ZXx10v91yzipFRng1EFXTRNDE3q9PvxiPc3kC7N/NHG8HiwAvhd7QjMgZAXOsuBD5nOs0AJkByYmf/' # 'test'
+    sudo: ALL=(ALL) NOPASSWD:ALL
 
 write_files:
   # resolv.conf hard-set is a workaround for intial setup
@@ -229,7 +227,7 @@ apt:
       keyserver: "hkp://keyserver.ubuntu.com:80"
       keyid: 307EA071
     docker:
-      arches: amd64
+#      arches: amd64
       source: "deb https://download.docker.com/linux/ubuntu $config stable"
       keyserver: "hkp://keyserver.ubuntu.com:80"
       keyid: 0EBFCD88
@@ -268,7 +266,6 @@ runcmd:
 power_state:
   timeout: 300
   mode: reboot
-  confirmation: true
 "@
 }
 
