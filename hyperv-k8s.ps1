@@ -243,6 +243,13 @@ packages:
   - chrony
 $kubepackages
 
+power_state:
+    delay: 30
+    mode: reboot
+    timeout: 30
+    message: Rebooting machine
+    condition: true
+
 # Capture all subprocess output into a logfile
 # Useful for troubleshooting cloud-init issues
 output: {all: '| tee -a /var/log/cloud-init-output.log'}
@@ -263,9 +270,6 @@ runcmd:
     touch /home/$guestuser/.init-completed
     EOF
 
-power_state:
-  timeout: 300
-  mode: reboot
 "@
 }
 
@@ -525,6 +529,7 @@ function Get-Ctrlc() {
 function Wait-NodeInit($opts, $name) {
 #  ssh $opts $guestuser@master 'sudo reboot 2> /dev/null'
   while ( ! $(ssh $opts $guestuser@master 'ls ~/.init-completed 2> /dev/null') ) {
+    ### should be able to use /var/lib/cloud/instance/boot-finished instead?
     Write-Output "waiting for $name to init..."
     Start-Sleep -seconds 5
     if ( Get-Ctrlc ) { exit 1 }
