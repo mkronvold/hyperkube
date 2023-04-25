@@ -313,7 +313,7 @@ function New-Machine($zwitch, $vmname, $cpus, $mem, $hdd, $vhdxtmpl, $cblock, $i
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
 
-  New-Item -itemtype directory -force -path $vmdir | Out-Null
+  New-Item -itemtype directory -force -path $vmdir # | Out-Null
 
   if (!(Test-Path $vhdx)) {
     Copy-Item -path $vhdxtmpl -destination $vhdx -force
