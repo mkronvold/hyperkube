@@ -313,31 +313,38 @@ function New-Machine($zwitch, $vmname, $cpus, $mem, $hdd, $vhdxtmpl, $cblock, $i
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
 
-  New-Item -itemtype directory -force -path $vmdir # | Out-Null
-
+  if (!(Test-Path $vmdir)) {
+    New-Item -itemtype directory -force -path $vmdir | Out-Null
+  }
   if (!(Test-Path $vhdx)) {
     Copy-Item -path $vhdxtmpl -destination $vhdx -force
     Resize-VHD -path $vhdx -sizebytes $hdd
-
+  }
+  if (!(Test-Path $workdir\isos)) {
+    New-Item -itemtype directory -force -path $vmdir # | Out-Null
+  }
+  if (!(Test-Path $workdir\isos\$vmname.iso)) {
     Write-ISOContents -vmname $vmname -cblock $cblock -ip $ip
     # New-ISO -vmname $vmname
     Copy-Item "$workdir\isos\$vmname.iso" -Destination "$workdir\$vmname"
-
-    $vm = New-VM -name $vmname -memorystartupbytes $mem -generation $generation `
-      -switchname $zwitch -vhdpath $vhdx -path $workdir
-
-    if ($generation -eq 2) {
-      Set-VMFirmware -vm $vm -enablesecureboot off
-    }
-
-    Set-VMProcessor -vm $vm -count $cpus
-    Add-VMDvdDrive -vmname $vmname -path $workdir\$vmname\$vmname.iso
-
-    if (!$mac) { $mac = New-MacAddress }
-
-    Get-VMNetworkAdapter -vm $vm | Set-VMNetworkAdapter -staticmacaddress $mac
-    Set-VMComPort -vmname $vmname -number 2 -path \\.\pipe\$vmname
   }
+
+  # Create the VM
+  $vm = New-VM -name $vmname -memorystartupbytes $mem -generation $generation `
+    -switchname $zwitch -vhdpath $vhdx -path $workdir
+
+  if ($generation -eq 2) {
+    Set-VMFirmware -vm $vm -enablesecureboot off
+  }
+
+  Set-VMProcessor -vm $vm -count $cpus
+  Add-VMDvdDrive -vmname $vmname -path $workdir\$vmname\$vmname.iso
+
+  if (!$mac) { $mac = New-MacAddress }
+
+  Get-VMNetworkAdapter -vm $vm | Set-VMNetworkAdapter -staticmacaddress $mac
+  Set-VMComPort -vmname $vmname -number 2 -path \\.\pipe\$vmname
+
   Start-VM -name $vmname
 }
 
