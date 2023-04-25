@@ -715,7 +715,11 @@ switch -regex ($args) {
   }
   ^Initialize-Kubeadm$ { 
     # restart each VM to make sure they're fully initialized
-    Get-K8sVM | ForEach-Object { $node = $_.name; $(ssh $sshopts $guestuser@$node 'sudo reboot') }
+    Get-K8sVM | ForEach-Object {
+      $node = $_.name
+      Write-Output "`nrebooting $node"
+      ssh $sshopts $guestuser@$node 'sudo reboot 2> /dev/null'
+      }
     # wait for each node to initialize before continuing
     Get-K8sVM | ForEach-Object { Wait-NodeInit -opts $sshopts -name $_.name }
 
@@ -758,7 +762,11 @@ switch -regex ($args) {
     Save-KubeConnfig
   }
   ^Restart-K8sVM$ {
-    Get-K8sVM | ForEach-Object { $node = $_.name; $(ssh $sshopts $guestuser@$node 'sudo reboot') }
+    Get-K8sVM | ForEach-Object {
+      $node = $_.name
+      Write-Output "`nrebooting $node"
+      ssh $sshopts $guestuser@$node 'sudo reboot 2> /dev/null'
+      }
   }
   ^Shutdown-K8sVM$ {
     Get-K8sVM | ForEach-Object { $node = $_.name; $(ssh $sshopts $guestuser@$node 'sudo shutdown -h now') }
