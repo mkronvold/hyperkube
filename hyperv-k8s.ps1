@@ -713,8 +713,11 @@ switch -regex ($args) {
   ^Get-Info$ {
     Get-K8sVM
   }
-  ^Initialize-Kubeadm$ {
-    Restart-K8sVM
+  ^Initialize-Kubeadm$ { 
+    # restart each VM to make sure they're fully initialized
+    Get-K8sVM | ForEach-Object { $node = $_.name; $(ssh $sshopts $guestuser@$node 'sudo reboot') }
+
+    # wait for each node to initialize before continuing
     Get-K8sVM | ForEach-Object { Wait-NodeInit -opts $sshopts -name $_.name }
 
     $init = "sudo kubeadm init --pod-network-cidr=$cninet && \
