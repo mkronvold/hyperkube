@@ -523,6 +523,7 @@ function Get-Ctrlc() {
 }
 
 function Wait-NodeInit($opts, $name) {
+#  ssh $opts $guestuser@master 'sudo reboot 2> /dev/null'
   while ( ! $(ssh $opts $guestuser@master 'ls ~/.init-completed 2> /dev/null') ) {
     Write-Output "waiting for $name to init..."
     Start-Sleep -seconds 5
@@ -601,8 +602,8 @@ switch -regex ($args) {
   Initialize-Kubeadm - Initialize kubeadm
    Start-KubeadmJoin - Run Kubeadm join command
      Save-KubeConfig - Save Kube config to host
-       Restart-K8sVM - Soft-reboot the nodes
-     Invoke-Shutdown - Soft-shutdown the nodes
+       Restart-K8sVM - Soft-reboot the VMs
+      Shutdown-K8sVM - Soft-shutdown the VMs
           Save-K8sVM - Snapshot the VMs
        Restore-K8sVM - Restore VMs from latest snapshots
           Stop-K8sVM - Stop the VMs
@@ -713,6 +714,7 @@ switch -regex ($args) {
     Get-K8sVM
   }
   ^Initialize-Kubeadm$ {
+    Restart-K8sVM
     Get-K8sVM | ForEach-Object { Wait-NodeInit -opts $sshopts -name $_.name }
 
     $init = "sudo kubeadm init --pod-network-cidr=$cninet && \
@@ -756,7 +758,7 @@ switch -regex ($args) {
   ^Restart-K8sVM$ {
     Get-K8sVM | ForEach-Object { $node = $_.name; $(ssh $sshopts $guestuser@$node 'sudo reboot') }
   }
-  ^Invoke-Shutdown$ {
+  ^Shutdown-K8sVM$ {
     Get-K8sVM | ForEach-Object { $node = $_.name; $(ssh $sshopts $guestuser@$node 'sudo shutdown -h now') }
   }
   ^Save-K8sVM$ {
