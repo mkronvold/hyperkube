@@ -616,12 +616,13 @@ switch -regex ($args) {
   Initialize-Kubeadm - Initialize kubeadm
    Start-KubeadmJoin - Run Kubeadm join command
      Save-KubeConfig - Save Kube config to host
-       Restart-K8sVM - Soft-reboot the VMs
-      Shutdown-K8sVM - Soft-shutdown the VMs
           Save-K8sVM - Snapshot the VMs
        Restore-K8sVM - Restore VMs from latest snapshots
-          Stop-K8sVM - Stop the VMs
          Start-K8sVM - Start the VMs
+       Restart-K8sVM - Soft-reboot the VMs
+         Reset-K8sVM - Hard-reboot the VMs
+      Shutdown-K8sVM - Soft-shutdown the VMs
+          Stop-K8sVM - Hard-Stop the VMs
         Remove-K8sVM - Stop VMs and delete the VM files
       Remove-Network - Delete the network
 "@
@@ -788,8 +789,11 @@ switch -regex ($args) {
     Get-K8sVM | Foreach-Object { $_ | Get-VMSnapshot | Sort-Object creationtime | `
         Select-Object -last 1 | Restore-VMSnapshot -confirm:$false }
   }
+  ^Reset-K8sVM$ {
+    Get-K8sVM | Restart-VM -Confirm:$False
+  }
   ^Stop-K8sVM$ {
-    Get-K8sVM | Stop-VM
+    Get-K8sVM | Stop-VM -Confirm:$False
   }
   ^Start-K8sVM$ {
     Get-K8sVM | Start-VM
