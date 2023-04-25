@@ -293,10 +293,10 @@ function New-ISO($vmname) {
   $fsi.Root.AddTreeWithNamedStreams($path, $false)
   $isopath = "$vmdir\$vmname.iso"
   $res = $fsi.CreateResultImage()
-  $cp = New-Object CodeDom.Compiler.CompilerParameters
-  $cp.CompilerOptions = "/unsafe"
+#  $cp = New-Object CodeDom.Compiler.CompilerParameters
+#  $cp.CompilerOptions = "/unsafe"
   if (!('ISOFile' -as [type])) {
-    Add-Type -CompilerOptions $cp -TypeDefinition @"
+    Add-Type -CompilerOptions "/unsafe" -TypeDefinition @"
       public class ISOFile {
         public unsafe static void Create(string iso, object stream, int blkSz, int blkCnt) {
           int bytes = 0; byte[] buf = new byte[blkSz];
