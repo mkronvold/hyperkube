@@ -19,7 +19,7 @@ PowerShell script to deploy Kubernetes cluster on Microsoft Hyper-V Server
 - .\hyperv-k8s.ps1 Save-ISOMaster
 - .\hyperv-k8s.ps1 Save-ISONode1
 
-✅Windows Admin center:
+✅Windows hyper-v server (can be same machine):
 - Upload created isos (on Windows client) to `C:\Users\${username}\hyperkube`
 - Run PowerShell as Administrator
 - cd $Home\hyperkube
