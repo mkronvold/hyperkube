@@ -719,15 +719,11 @@ switch -regex ($args) {
     Get-K8sVM
   }
   ^Initialize-Kubeadm$ { 
-    # restart each VM to make sure they're fully initialized
-    Get-K8sVM | ForEach-Object {
-      $node = $_.name
-      Write-Output "`nrebooting $node"
-      ssh $sshopts $guestuser@$node 'sudo reboot 2> /dev/null'
-      }
     # wait for each node to initialize before continuing
     Get-K8sVM | ForEach-Object { Wait-NodeInit -opts $sshopts -name $_.name }
 
+    Write-Output "`ninitializing master"
+    
     $init = "sudo kubeadm init --pod-network-cidr=$cninet && \
       mkdir -p `$HOME/.kube && \
       sudo cp /etc/kubernetes/admin.conf `$HOME/.kube/config && \
