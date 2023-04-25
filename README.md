@@ -1,6 +1,39 @@
 # hyperv-k8s
 PowerShell script to deploy Kubernetes cluster on Microsoft Hyper-V Server
 
+# Quick Guide
+
+✅Hyper-V server:
+- Generate SSH Public key: ssh-keygen
+
+✅Windows client:
+- Run PowerShell as Admin and cd to $Home\hyperkube
+- Go to Window Admin Center  download public ssh key and save to `$Home\.ssh`
+- Download and setup Qemu-Img portable
+- curl https://cloudbase.it/downloads/qemu-img-win-x64-2_3_0.zip -o qemu-img.zip
+- 7z x .\qemu-img.zip
+- set-executionpolicy remotesigned
+- del .\hyperv-k8s.ps1
+- curl https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/hyperv-k8s.ps1 -o hyperv-k8s.ps1
+- .\hyperv-k8s.ps1 Get-Image
+- .\hyperv-k8s.ps1 Save-ISOMaster
+- .\hyperv-k8s.ps1 Save-ISONode1
+
+✅Windows hyper-v server (can be same machine):
+- Upload created isos (on Windows client) to `C:\Users\${username}\hyperkube`
+- Run PowerShell as Administrator
+- cd $Home\hyperkube
+- curl https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/hyperv-k8s.ps1 -o hyperv-k8s.ps1
+- .\hyperv-k8s.ps1 Install-Tools
+- .\hyperv-k8s.ps1 Deploy-HostsFile
+- .\hyperv-k8s.ps1 Deploy-Network
+- .\hyperv-k8s.ps1 Get-Image
+- .\hyperv-k8s.ps1 Deploy-Master
+- .\hyperv-k8s.ps1 Deploy-Node1
+- .\hyperv-k8s.ps1 Initialize-Kubeadm
+- .\hyperv-k8s.ps1 Start-KubeadmJoin
+- .\hyperv-k8s.ps1 Save-KubeConfig
+
 # Commands
 
 You have to Start Powershell as administartor and run command `set-executionpolicy remotesigned`. It make all scripts and configuration files downloaded from the Internet are signed by a trusted publisher.
@@ -19,7 +52,7 @@ You have to Start Powershell as administartor and run command `set-executionpoli
 - `Start-KubeadmJoin`: Run Kubeadm joind command
 - `Save-KubeConfig`: Save Kube config to host
 - `Restart-K8sVM`: Soft-reboot the nodes
-- `Invoke-Shutdown`: Soft-shutdown the nodes
+- `Shutdown-K8sVM`: Soft-shutdown the nodes
 - `Save-K8sVM`: Snapshot the VMs
 - `Restore-K8sVM`: Restore VMs from latest snapshots
 - `Stop-K8sVM`: Stop the VMs
@@ -31,34 +64,7 @@ You have to Start Powershell as administartor and run command `set-executionpoli
 
 - [Microsoft Hyper-V Server: Deploy a Kubernetes cluster](https://www.youtube.com/watch?v=MPjavnlRnQU)
 
-# Refereces
+# References
 - https://github.com/youurayy/hyperctl
 
-# From howto video
-
-✅Hyper-V server:
-- Generate SSH Public key: ssh-keygen
-
-✅Windows client:
-- Go to Window Admin Center  download public ssh key and save to `$Home\.ssh`
-- Download and setup Qemu-Img
-- Download my PowserShell scripts hyperv-k8s.ps1
-- Run PowerShell as Admin and cd to folder having hyperv-k8s.ps1
-- Run: .\hyperv-k8s.ps1 Get-Image
-- Run: .\hyperv-k8s.ps1 Save-ISOMaster
-- Run: .\hyperv-k8s.ps1 Save-ISONode1
-
-✅Windows Admin center:
-- Upload created isos (on Windows client) to `C:\Users\Administrator\Documents\isos`
-- Upload hyperv-k8s.ps1 to `C:\Users\Administrator\Documents`
-- Open PowersShell: 
-- Run: .\hyperv-k8s.ps1 Install-Tools
-- Run: .\hyperv-k8s.ps1 Deploy-HostsFile
-- Run: .\hyperv-k8s.ps1 Deploy-Network
-- Run: .\hyperv-k8s.ps1 Get-Image
-- Run: .\hyperv-k8s.ps1 Deploy-Master
-- Run: .\hyperv-k8s.ps1 Deploy-Node1
-- Run: .\hyperv-k8s.ps1 Initialize-Kubeadm
-- Run: .\hyperv-k8s.ps1 Start-KubeadmJoin
-- Run: .\hyperv-k8s.ps1 Save-KubeConfig
 
