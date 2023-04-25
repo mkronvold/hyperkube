@@ -294,9 +294,9 @@ function New-ISO($vmname) {
   $isopath = "$vmdir\$vmname.iso"
   $res = $fsi.CreateResultImage()
   $cp = New-Object CodeDom.Compiler.CompilerParameters
-  $cp.CompilerOptions = "/unsafe"
+  $cp.CompilerOptions = "-unsafe"
   if (!('ISOFile' -as [type])) {
-    Add-Type -CompilerParameters $cp -TypeDefinition @"
+    Add-Type -CompilerOptions $cp -TypeDefinition @"
       public class ISOFile {
         public unsafe static void Create(string iso, object stream, int blkSz, int blkCnt) {
           int bytes = 0; byte[] buf = new byte[blkSz];
