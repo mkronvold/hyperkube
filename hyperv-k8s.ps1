@@ -276,6 +276,8 @@ runcmd:
     chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     # https://github.com/kubernetes/kubeadm/issues/954
     apt install -y linux-tools-virtual linux-cloud-tools-virtual
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh ./get-docker.sh
     touch /home/$guestuser/.init-completed
     EOF
 
