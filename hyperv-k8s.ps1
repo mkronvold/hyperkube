@@ -637,6 +637,7 @@ switch -regex ($args) {
     Write-Output "   workdir: $workdir"
     Write-Output " guestuser: $guestuser"
     Write-Output "   sshpath: $sshpath"
+    Write-Output "   sshopts: $sshopts"
     Write-Output "  imageurl: $imageurl"
     Write-Output "  vhdxtmpl: $vhdxtmpl"
     Write-Output "      cidr: $cidr.0/24"
