@@ -212,6 +212,12 @@ $(Get-UserdataShared -cblock $cblock)
       NamePolicy=kernel database onboard slot path
       MACAddressPolicy=none
   # https://github.com/clearlinux/distribution/issues/39
+  # apt force-confdef to keep old confs so chrony installs unattended
+  - path: /etc/apt/apt.conf.d/71debconf
+    content: |
+      Dpkg::Options {
+        "--force-confdef";
+      };
   - path: /etc/chrony/chrony.conf
     content: |
       refclock PHC /dev/ptp0 trust poll 2
@@ -260,24 +266,33 @@ runcmd:
     echo "sudo tail -f /var/log/syslog" > /home/$guestuser/log
     systemctl mask --now systemd-timesyncd
     cat /tmp/append-etc-hosts >> /etc/hosts
-    apt-get install -y apt-transport-https ca-certificates curl
-    chmod 755 /etc/apt/keyrings
-    mkdir -p /etc/apt/keyrings
+
+    apt-get install -y apt-transport-https ca-certificates curl gnupg
+    install -m 0755 -d /etc/apt/keyrings
     curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod 644 /etc/apt/keyrings/*.gpg
     apt-get update
+
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
+
     systemctl stop kubelet
-    apt install -y nfs-common chrony
-    systemctl enable --now chrony
     apt-get install -y kubelet kubeadm kubectl
     apt-mark hold kubelet kubeadm kubectl
-    mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
     chmod o+r /lib/systemd/system/kubelet.service
     chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     # https://github.com/kubernetes/kubeadm/issues/954
+
+    apt install -y nfs-common chrony
+    systemctl enable --now chrony
+
+    mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
     apt install -y linux-tools-virtual linux-cloud-tools-virtual
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    sh ./get-docker.sh
+
+#    curl -fsSL https://get.docker.com -o get-docker.sh
+#    sh ./get-docker.sh
+    echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list
+
     touch /home/$guestuser/.init-completed
     EOF
 
