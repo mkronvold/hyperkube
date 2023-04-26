@@ -213,11 +213,11 @@ $(Get-UserdataShared -cblock $cblock)
       MACAddressPolicy=none
   # https://github.com/clearlinux/distribution/issues/39
   # apt force-confdef to keep old confs so chrony installs unattended
-  - path: /etc/apt/apt.conf.d/71debconf
-    content: |
-      Dpkg::Options {
-        "--force-confdef";
-      };
+#  - path: /etc/apt/apt.conf.d/71debconf
+#    content: |
+#      Dpkg::Options {
+#        "--force-confdef";
+#      };
   - path: /etc/chrony/chrony.conf
     content: |
       refclock PHC /dev/ptp0 trust poll 2
