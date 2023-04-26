@@ -212,12 +212,6 @@ $(Get-UserdataShared -cblock $cblock)
       NamePolicy=kernel database onboard slot path
       MACAddressPolicy=none
   # https://github.com/clearlinux/distribution/issues/39
-  # apt force-confdef to keep old confs so chrony installs unattended
-#  - path: /etc/apt/apt.conf.d/71debconf
-#    content: |
-#      Dpkg::Options {
-#        "--force-confdef";
-#      };
   - path: /etc/chrony/chrony.conf
     content: |
       refclock PHC /dev/ptp0 trust poll 2
@@ -229,12 +223,14 @@ $(Get-UserdataShared -cblock $cblock)
 apt:
   sources:
     kubernetes:
-      source: "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+      source: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
       keyserver: "hkp://keyserver.ubuntu.com:80"
+      #https://packages.cloud.google.com/apt/doc/apt-key.gpg
       keyid: 307EA071
     docker:
       source: "deb https://download.docker.com/linux/ubuntu $config stable"
       keyserver: "hkp://keyserver.ubuntu.com:80"
+      #https://download.docker.com/linux/ubuntu/gpg
       keyid: 0EBFCD88
 
 package_update: true
@@ -242,10 +238,15 @@ package_update: true
 package_upgrade: true
 
 packages:
+packages:
   - linux-tools-virtual
   - linux-cloud-tools-virtual
   - nfs-common
   - chrony
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
 $kubepackages
 
 power_state:
@@ -266,31 +267,31 @@ runcmd:
     systemctl mask --now systemd-timesyncd
     cat /tmp/append-etc-hosts >> /etc/hosts
    #### apt keys and sources
-    apt-get install -y apt-transport-https ca-certificates curl gnupg
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    chmod 644 /etc/apt/keyrings/*.gpg
-    apt-get update
+#    apt-get install -y apt-transport-https ca-certificates curl gnupg
+#    install -m 0755 -d /etc/apt/keyrings
+#    curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+#    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+#    chmod 644 /etc/apt/keyrings/*.gpg
+#    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
+#    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $config stable" | sudo tee /etc/apt/sources.list.d/docker.list
+#    apt-get update
    #### install Kubernetes
-    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
     systemctl stop kubelet
-    apt-get install -y kubelet kubeadm kubectl
+#    apt-get install -y kubelet kubeadm kubectl
     apt-mark hold kubelet kubeadm kubectl
     chmod o+r /lib/systemd/system/kubelet.service
     chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     # https://github.com/kubernetes/kubeadm/issues/954
    #### install other packages
-    apt install -y nfs-common chrony
+#    apt install -y nfs-common chrony
     systemctl enable --now chrony
    #### setup hyper-v extensions
     mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
-    apt install -y linux-tools-virtual linux-cloud-tools-virtual
+#    apt install -y linux-tools-virtual linux-cloud-tools-virtual
    #### Install Docker
 #    curl -fsSL https://get.docker.com -o get-docker.sh
 #    sh ./get-docker.sh
-    . /etc/os-release
-    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $config stable" | sudo tee /etc/apt/sources.list.d/docker.list
+   # apt install -y docker-ce
    #### Mark Complete
     touch /home/$guestuser/.init-completed
     EOF
