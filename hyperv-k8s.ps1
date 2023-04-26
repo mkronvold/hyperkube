@@ -266,33 +266,32 @@ runcmd:
     echo "sudo tail -f /var/log/syslog" > /home/$guestuser/log
     systemctl mask --now systemd-timesyncd
     cat /tmp/append-etc-hosts >> /etc/hosts
-
+   #### apt keys and sources
     apt-get install -y apt-transport-https ca-certificates curl gnupg
     install -m 0755 -d /etc/apt/keyrings
     curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     chmod 644 /etc/apt/keyrings/*.gpg
     apt-get update
-
+   #### install Kubernetes
     echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
-
     systemctl stop kubelet
     apt-get install -y kubelet kubeadm kubectl
     apt-mark hold kubelet kubeadm kubectl
     chmod o+r /lib/systemd/system/kubelet.service
     chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
     # https://github.com/kubernetes/kubeadm/issues/954
-
+   #### install other packages
     apt install -y nfs-common chrony
     systemctl enable --now chrony
-
+   #### setup hyper-v extensions
     mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
     apt install -y linux-tools-virtual linux-cloud-tools-virtual
-
+   #### Install Docker
 #    curl -fsSL https://get.docker.com -o get-docker.sh
 #    sh ./get-docker.sh
     echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list
-
+   #### Mark Complete
     touch /home/$guestuser/.init-completed
     EOF
 
