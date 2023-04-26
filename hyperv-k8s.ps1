@@ -238,7 +238,6 @@ package_update: true
 package_upgrade: true
 
 packages:
-packages:
   - linux-tools-virtual
   - linux-cloud-tools-virtual
   - nfs-common
