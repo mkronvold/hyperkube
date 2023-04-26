@@ -233,7 +233,6 @@ apt:
       keyserver: "hkp://keyserver.ubuntu.com:80"
       keyid: 307EA071
     docker:
-#      arches: amd64
       source: "deb https://download.docker.com/linux/ubuntu $config stable"
       keyserver: "hkp://keyserver.ubuntu.com:80"
       keyid: 0EBFCD88
@@ -290,9 +289,8 @@ runcmd:
    #### Install Docker
 #    curl -fsSL https://get.docker.com -o get-docker.sh
 #    sh ./get-docker.sh
-export arch=$(dpkg --print-architecture)
-export release=$(. /etc/os-release && echo "$VERSION_CODENAME")
-    echo "deb [arch=$arch signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $release stable" | sudo tee /etc/apt/sources.list.d/docker.list
+    . /etc/os-release
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $config stable" | sudo tee /etc/apt/sources.list.d/docker.list
    #### Mark Complete
     touch /home/$guestuser/.init-completed
     EOF
