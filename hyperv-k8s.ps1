@@ -290,9 +290,9 @@ runcmd:
    #### Install Docker
 #    curl -fsSL https://get.docker.com -o get-docker.sh
 #    sh ./get-docker.sh
-#export arch=`dpkg --print-architecture`
-#export release=`. /etc/os-release && echo "$VERSION_CODENAME")`
-    echo "deb [arch=`dpkg --print-architecture` signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu `. /etc/os-release && echo "$VERSION_CODENAME"` stable" | sudo tee /etc/apt/sources.list.d/docker.list
+export arch=$(dpkg --print-architecture)
+export release=$(. /etc/os-release && echo "$VERSION_CODENAME")
+    echo "deb [arch=$arch signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $release stable" | sudo tee /etc/apt/sources.list.d/docker.list
    #### Mark Complete
     touch /home/$guestuser/.init-completed
     EOF
