@@ -66,10 +66,11 @@ $macs = @(
 # https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64/repodata/filelists.xml
 # https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages
 # ctrl+f "kubeadm"
-$kubeversion = '1.22.1-00'
+$kubeversion = '1.27.1-00'
 
 $kubepackages = @"
   - docker-ce
+  - docker-ce-cli
   - [ kubelet, $kubeversion ]
   - [ kubeadm, $kubeversion ]
   - [ kubectl, $kubeversion ]
@@ -80,7 +81,7 @@ $dockercli  = 'https://github.com/StefanScherer/docker-cli-builder/releases/down
 $kubectlcli = 'https://dl.k8s.io/release/v1.22.0/bin/windows/amd64/kubectl.exe'
 $qemuimgcli = 'https://cloudbase.it/downloads/qemu-img-win-x64-2_3_0.zip'
 
-$cni = 'calico'
+$cni = 'flannel'
 
 switch ($cni) {
   'flannel' {
@@ -173,7 +174,7 @@ write_files:
       [Resolve]
       DNS=8.8.4.4
       FallbackDNS=8.8.8.8
-  - path: /tmp/append-etc-hosts
+  - path: /root/append-etc-hosts
     content: |
       $(Set-HostsFile -cblock $cblock -prefix '      ')
   - path: /etc/modules-load.d/k8s.conf
@@ -211,7 +212,7 @@ $(Get-UserdataShared -cblock $cblock)
       [Link]
       NamePolicy=kernel database onboard slot path
       MACAddressPolicy=none
-  # https://github.com/clearlinux/distribution/issues/39
+      # https://github.com/clearlinux/distribution/issues/39
   - path: /etc/chrony/chrony.conf
     content: |
       refclock PHC /dev/ptp0 trust poll 2
@@ -220,18 +221,26 @@ $(Get-UserdataShared -cblock $cblock)
       #pool pool.ntp.org iburst
       driftfile /var/lib/chrony/chrony.drift
       logdir /var/log/chrony
+
 apt:
+  conf: |
+      Acquire::Retries "180";
+      DPkg::Lock::Timeout "180";
+      APT {
+          Get {
+              Assume-Yes 'true';
+              Fix-Broken 'true';
+          }
+      }
   sources:
     kubernetes:
-      source: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
-      keyserver: "hkp://keyserver.ubuntu.com:80"
-      #https://packages.cloud.google.com/apt/doc/apt-key.gpg
-      keyid: 307EA071
-    docker:
-      source: "deb https://download.docker.com/linux/ubuntu $config stable"
-      keyserver: "hkp://keyserver.ubuntu.com:80"
-      #https://download.docker.com/linux/ubuntu/gpg
-      keyid: 0EBFCD88
+      keyserver: "hkps://keyserver.ubuntu.com"
+      keyid: A362B822F6DEDC652817EA46B53DC80D13EDEF05
+      source: "deb [signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+    docker.list:
+      keyserver: "hkps://keyserver.ubuntu.com"
+      keyid: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+      source: 'deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/docker.gpg] https://download.docker.com/linux/ubuntu $config stable'
 
 package_update: true
 
@@ -249,9 +258,9 @@ packages:
 $kubepackages
 
 power_state:
-    delay: 30
+    delay: now
     mode: reboot
-    timeout: 30
+    timeout: 1
     message: Rebooting machine
     condition: true
 
@@ -261,40 +270,20 @@ output: {all: '| tee -a /var/log/cloud-init-output.log'}
 
 runcmd:
   - [ touch, "/home/$guestuser/.init-started" ]
-  - |
-    echo "sudo tail -f /var/log/syslog" > /home/$guestuser/log
-    systemctl mask --now systemd-timesyncd
-    cat /tmp/append-etc-hosts >> /etc/hosts
-   #### apt keys and sources
-#    apt-get install -y apt-transport-https ca-certificates curl gnupg
-#    install -m 0755 -d /etc/apt/keyrings
-#    curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-#    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-#    chmod 644 /etc/apt/keyrings/*.gpg
-#    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" |  tee /etc/apt/sources.list.d/kubernetes.list
-#    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $config stable" | sudo tee /etc/apt/sources.list.d/docker.list
-#    apt-get update
-   #### install Kubernetes
-    systemctl stop kubelet
-#    apt-get install -y kubelet kubeadm kubectl
-    apt-mark hold kubelet kubeadm kubectl
-    chmod o+r /lib/systemd/system/kubelet.service
-    chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-    # https://github.com/kubernetes/kubeadm/issues/954
-   #### install other packages
-#    apt install -y nfs-common chrony
-    systemctl enable --now chrony
-   #### setup hyper-v extensions
-    mkdir -p /usr/libexec/hypervkvpd && ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
-#    apt install -y linux-tools-virtual linux-cloud-tools-virtual
-   #### Install Docker
-#    curl -fsSL https://get.docker.com -o get-docker.sh
-#    sh ./get-docker.sh
-   # apt install -y docker-ce
-   #### Mark Complete
-    touch /home/$guestuser/.init-completed
-    EOF
-
+  - echo "sudo tail -f /var/log/syslog" > /home/$guestuser/log
+  - systemctl mask --now systemd-timesyncd
+  - cat /root/append-etc-hosts >> /etc/hosts
+  - systemctl stop kubelet
+  - apt-mark hold kubelet kubeadm kubectl
+  - chmod o+r /lib/systemd/system/kubelet.service
+  - chmod o+r /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+  - systemctl enable --now chrony
+  - mkdir -p /usr/libexec/hypervkvpd
+  - ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
+  - touch /home/$guestuser/.init-completed
+#  - [docker, pull, hello-world]
+#  - [docker, run, hello-world]
+#  - [docker, images, hello-world]
 "@
 }
 
@@ -750,7 +739,8 @@ switch -regex ($args) {
 
     Write-Output "`ninitializing master"
     
-    $init = "sudo kubeadm init --pod-network-cidr=$cninet && \
+    $init = "sudo rm -f /etc/containerd/config.toml && \
+      sudo kubeadm init --pod-network-cidr=$cninet && \
       mkdir -p `$HOME/.kube && \
       sudo cp /etc/kubernetes/admin.conf `$HOME/.kube/config && \
       sudo chown `$(id -u):`$(id -g) `$HOME/.kube/config && \
