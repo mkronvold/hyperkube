@@ -280,6 +280,8 @@ runcmd:
   - systemctl enable --now chrony
   - mkdir -p /usr/libexec/hypervkvpd
   - ln -s /usr/sbin/hv_get_dns_info /usr/sbin/hv_get_dhcp_info /usr/libexec/hypervkvpd
+  - sudo rm -f /etc/containerd/config.toml
+  - sudo systemctl restart containerd
   - touch /home/$guestuser/.init-completed
 #  - [docker, pull, hello-world]
 #  - [docker, run, hello-world]
@@ -739,9 +741,7 @@ switch -regex ($args) {
 
     Write-Output "`ninitializing master"
     
-    $init = "sudo rm -f /etc/containerd/config.toml && \
-      sudo systemctl restart containerd && \
-      sudo kubeadm init --pod-network-cidr=$cninet && \
+    $init = "sudo kubeadm init --pod-network-cidr=$cninet && \
       mkdir -p `$HOME/.kube && \
       sudo cp /etc/kubernetes/admin.conf `$HOME/.kube/config && \
       sudo chown `$(id -u):`$(id -g) `$HOME/.kube/config && \
