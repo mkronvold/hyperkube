@@ -740,6 +740,7 @@ switch -regex ($args) {
     Write-Output "`ninitializing master"
     
     $init = "sudo rm -f /etc/containerd/config.toml && \
+      sudo systemctl restart containerd && \
       sudo kubeadm init --pod-network-cidr=$cninet && \
       mkdir -p `$HOME/.kube && \
       sudo cp /etc/kubernetes/admin.conf `$HOME/.kube/config && \
