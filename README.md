@@ -3,37 +3,49 @@ PowerShell script to deploy Kubernetes cluster on Microsoft Hyper-V Server
 
 # Quick Guide
 
+##Get git
+```
+winget install --id Git.Git -e --source winget
+```
+
 ✅Hyper-V server:
-- Generate SSH Public key: ssh-keygen
+- Generate SSH Public key
+```
+ssh-keygen
+```
 
 ✅Windows client:
-- Run PowerShell as Admin and cd to $Home\hyperkube
+- Run PowerShell as Admin
 - Go to Window Admin Center  download public ssh key and save to `$Home\.ssh`
 - Download and setup Qemu-Img portable
-- curl https://cloudbase.it/downloads/qemu-img-win-x64-2_3_0.zip -o qemu-img.zip
-- 7z x .\qemu-img.zip
-- set-executionpolicy remotesigned
-- del .\hyperv-k8s.ps1
-- curl https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/hyperv-k8s.ps1 -o hyperv-k8s.ps1
-- .\hyperv-k8s.ps1 Get-Image
-- .\hyperv-k8s.ps1 Save-ISOMaster
-- .\hyperv-k8s.ps1 Save-ISONode1
+```
+cd to $Home\hyperkube
+curl https://cloudbase.it/downloads/qemu-img-win-x64-2_3_0.zip -o qemu-img.zip
+7z x .\qemu-img.zip
+set-executionpolicy remotesigned
+del .\hyperv-k8s.ps1
+curl https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/hyperv-k8s.ps1 -o hyperv-k8s.ps1
+.\hyperv-k8s.ps1 Get-Image
+.\hyperv-k8s.ps1 Save-ISOMaster
+.\hyperv-k8s.ps1 Save-ISONode1
+```
 
 ✅Windows hyper-v server (can be same machine):
 - Upload created isos (on Windows client) to `C:\Users\${username}\hyperkube`
 - Run PowerShell as Administrator
-- cd $Home\hyperkube
-- curl https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/hyperv-k8s.ps1 -o hyperv-k8s.ps1
-- .\hyperv-k8s.ps1 Install-Tools
-- .\hyperv-k8s.ps1 Deploy-HostsFile
-- .\hyperv-k8s.ps1 Deploy-Network
-- .\hyperv-k8s.ps1 Get-Image
-- .\hyperv-k8s.ps1 Deploy-Master
-- .\hyperv-k8s.ps1 Deploy-Node1
-- .\hyperv-k8s.ps1 Initialize-Kubeadm
-- .\hyperv-k8s.ps1 Start-KubeadmJoin
-- .\hyperv-k8s.ps1 Save-KubeConfig
-
+```
+cd $Home\hyperkube
+curl https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/hyperv-k8s.ps1 -o hyperv-k8s.ps1
+.\hyperv-k8s.ps1 Install-Tools
+.\hyperv-k8s.ps1 Deploy-HostsFile
+.\hyperv-k8s.ps1 Deploy-Network
+.\hyperv-k8s.ps1 Get-Image
+.\hyperv-k8s.ps1 Deploy-Master
+.\hyperv-k8s.ps1 Deploy-Node1
+.\hyperv-k8s.ps1 Initialize-Kubeadm
+.\hyperv-k8s.ps1 Start-KubeadmJoin
+.\hyperv-k8s.ps1 Save-KubeConfig
+```
 # Commands
 
 You have to Start Powershell as administartor and run command `set-executionpolicy remotesigned`. It make all scripts and configuration files downloaded from the Internet are signed by a trusted publisher.
@@ -66,5 +78,4 @@ You have to Start Powershell as administartor and run command `set-executionpoli
 
 # References
 - https://github.com/youurayy/hyperctl
-
 
