@@ -16,7 +16,7 @@ configure arguments: --with-cc=cl --builddir=objs --prefix= --conf-path=conf/ngi
 ```
 
 ```powershell
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/nvtienanh/hyperv-k8s/main/nginx/nginx.zip' -OutFile 'C:\nginx.zip'
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/nginx/nginx.zip' -OutFile 'C:\nginx.zip'
 Expand-Archive -LiteralPath 'C:\nginx.zip' -DestinationPath C:\
 Remove-Item 'C:\nginx.zip'
 ```
@@ -25,10 +25,10 @@ Remove-Item 'C:\nginx.zip'
 
 By default nginx/Windows runs as a standard console application. I'm using Windows Service Wrapper to make it run as a service
 
-## Install 
+## Install latest nginx
 
 ```powershell
-Invoke-WebRequest -Uri https://github.com/winsw/winsw/releases/download/v2.11.0/WinSW-x64.exe -OutFile 'C:\nginx\nginx-service.exe'
+Invoke-WebRequest -Uri https://github.com/winsw/winsw/releases/download/v2.12.0/WinSW-x64.exe -OutFile 'C:\nginx\nginx-service.exe'
 ```
 
 Create file `nginx-service.xml` in `C:\nginx`
