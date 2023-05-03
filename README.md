@@ -1,6 +1,8 @@
 # hyperv-k8s
 PowerShell script to deploy Kubernetes cluster on Microsoft Hyper-V Server
 
+forked from https://github.com/nvtienanh/hyperv-k8s and customized for my own use on a stand alone windows 2022 server.
+
 # Quick Guide
 
 ##Get git
