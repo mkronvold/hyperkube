@@ -40,7 +40,7 @@ $zwitch = 'K8s' # private or public switch name
 $natnet = 'KubeNatNet' # private net nat net name (privnet only)
 $adapter = 'Ethernet' # public net adapter name (pubnet only)
 
-$cpus = 2
+$cpu = 2
 $ram = '4GB'
 $hdd = '20GB'
 
@@ -336,9 +336,15 @@ function New-ISO($vmname) {
   [ISOFile]::Create($isopath, $res.ImageStream, $res.BlockSize, $res.TotalBlocks)
 }
 
-function New-Machine($zwitch, $vmname, $cpus, $mem, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
+function New-Machine($zwitch, $vmname, $cpu, $mem, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
+  $conf = "config\$vmname.conf"
+
+  if (!(Test-Path $conf)) {
+    Write-Host "Config missing.  Create $conf and try again"
+    return
+  }  
 
   if (!(Test-Path $vmdir)) {
     New-Item -itemtype directory -force -path $vmdir | Out-Null
@@ -363,7 +369,7 @@ function New-Machine($zwitch, $vmname, $cpus, $mem, $hdd, $vhdxtmpl, $cblock, $i
     Set-VMFirmware -vmname $vmname -enablesecureboot off
   }
 
-  Set-VMProcessor -vmname $vmname -count $cpus
+  Set-VMProcessor -vmname $vmname -count $cpu
 
   if (!$mac) { $mac = New-MacAddress }
   Get-VMNetworkAdapter -vmname $vmname | Set-VMNetworkAdapter -staticmacaddress $mac
@@ -375,7 +381,7 @@ function New-Machine($zwitch, $vmname, $cpus, $mem, $hdd, $vhdxtmpl, $cblock, $i
 }
 
 # Write ISO file to local machine
-function Write-ISO($zwitch, $vmname, $cpus, $mem, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
+function Write-ISO($zwitch, $vmname, $cpu, $mem, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
   New-Item -itemtype directory -force -path $vmdir | Out-Null
@@ -677,7 +683,7 @@ switch -regex ($args) {
       'private' { Write-Output "    natnet: $natnet" }
       'public' { Write-Output "   adapter: $adapter" }
     }
-    Write-Output "      cpus: $cpus"
+    Write-Output "      cpus: $cpu"
     Write-Output "       ram: $ram"
     Write-Output "       hdd: $hdd"
     Write-Output "       cni: $cni"
@@ -709,26 +715,26 @@ switch -regex ($args) {
     New-VHDXTmpl -imageurl $imageurl -srcimg $srcimg -vhdxtmpl $vhdxtmpl
   }
   ^Deploy-Master$ {
-    New-Machine -zwitch $zwitch -vmname 'master' -cpus $cpus `
+    New-Machine -zwitch $zwitch -vmname 'master' -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
   }
   '(^Deploy-Node(?<number>\d+)$)' {
     $num = [int]$matches.number
     $name = "node$($num)"
-    New-Machine -zwitch $zwitch -vmname $name -cpus $cpus `
+    New-Machine -zwitch $zwitch -vmname $name -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
   }
   ^Save-ISOMaster$ {
-    Write-ISO -zwitch $zwitch -vmname 'master' -cpus $cpus `
+    Write-ISO -zwitch $zwitch -vmname 'master' -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
   }
   '(^Save-ISONode(?<number>\d+)$)' {
     $num = [int]$matches.number
     $name = "node$($num)"
-    Write-ISO -zwitch $zwitch -vmname $name -cpus $cpus `
+    Write-ISO -zwitch $zwitch -vmname $name -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
   }
