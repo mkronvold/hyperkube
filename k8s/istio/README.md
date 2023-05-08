@@ -32,7 +32,7 @@ $SECURE_INGRESS_PORT = ((kubectl -n istio-system get service istio-ingressgatewa
 ```powershell
 cd C:\istio-1.11.1
 kubectl apply -f samples/addons
-kubectl apply -f https://raw.githubusercontent.com/nvtienanh/hyperv-k8s/main/k8s/istio/istio-services-node-port.yaml
+kubectl apply -f https://raw.githubusercontent.com/mkronvold/hyperkube/main/k8s/istio/istio-services-node-port.yaml
 ```
 
 # NetNatStaticMapping
@@ -61,7 +61,7 @@ Add-NetNatStaticMapping -ExternalIPAddress "0.0.0.0/24" -ExternalPort 80 -Protoc
 ```powershell
 kubectl create namespace example
 kubectl label namespace example istio-injection=enabled
-kubectl -n example apply -f https://raw.githubusercontent.com/nvtienanh/hyperv-k8s/main/k8s/istio/example/apple.yaml
-kubectl -n example apply -f https://raw.githubusercontent.com/nvtienanh/hyperv-k8s/main/k8s/istio/example/banana.yaml
-kubectl -n example apply -f https://raw.githubusercontent.com/nvtienanh/hyperv-k8s/main/k8s/istio/example/istio.yaml
+kubectl -n example apply -f https://raw.githubusercontent.com/mkronvold/hyperkube/main/k8s/istio/example/apple.yaml
+kubectl -n example apply -f https://raw.githubusercontent.com/mkronvold/hyperkube/main/k8s/istio/example/banana.yaml
+kubectl -n example apply -f https://raw.githubusercontent.com/mkronvold/hyperkube/main/k8s/istio/example/istio.yaml
 ```

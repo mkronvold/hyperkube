@@ -7,7 +7,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/a
 # Create NodePort server to access dashboard
 
 ```powershell
-kubectl apply -f https://raw.githubusercontent.com/nvtienanh/hyperv-k8s/main/k8s/kubernetes-dashboard/kubernetes-dashboard-service-np.yaml
+kubectl apply -f https://raw.githubusercontent.com/mkronvold/hyperkube/main/k8s/kubernetes-dashboard/kubernetes-dashboard-service-np.yaml
 ```
 
 # NetNatStaticMapping

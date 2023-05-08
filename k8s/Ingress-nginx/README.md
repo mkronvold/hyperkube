@@ -35,5 +35,5 @@ data:
 ```
 
 ```powershell
-kubectl apply -f https://raw.githubusercontent.com/nvtienanh/hyperv-k8s/main/k8s/Ingress-nginx/metallb-config.yaml
+kubectl apply -f https://raw.githubusercontent.com/mkronvold/hyperkube/main/k8s/Ingress-nginx/metallb-config.yaml
 ```
