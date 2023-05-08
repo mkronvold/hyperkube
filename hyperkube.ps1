@@ -339,12 +339,6 @@ function New-ISO($vmname) {
 function New-Machine($zwitch, $vmname, $cpu, $mem, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
-  $conf = "config\$vmname.conf"
-
-  if (!(Test-Path $conf)) {
-    Write-Host "Config missing.  Create $conf and try again"
-    return
-  }  
 
   if (!(Test-Path $vmdir)) {
     New-Item -itemtype directory -force -path $vmdir | Out-Null
@@ -494,7 +488,7 @@ function Update-HostsFile($cblock) {
   Get-Content $etchosts
 }
 
-function New-Nodes($num, $cblock) {
+
   1..$num | ForEach-Object {
     Write-Output creating node $_
     New-Machine -zwitch $zwitch -vmname "node$_" -cpus 4 -mem 4GB -hdd 40GB `
@@ -567,6 +561,38 @@ function Convert-UNCPath2($path) {
   return ($path -replace '^[^:]*:?(.+)$', "`$1").replace('\', '/')
 }
 
+function Read-cpu($name) {
+#  $conf = "config\$vmname.conf"
+#  if (!(Test-Path $conf)) {
+#    Write-Host "Config missing.  Create $conf and try again"
+#    return $False
+#  }  
+	 Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	 	       $vmname=$_.BaseName
+		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
+#		       $_.BaseName
+#		       $vmname.cpu
+#		       $vmname.ram
+#		       $vmname.hdd
+		       }
+	return ($name.cpu)
+}
+
+function Read-ram($name) {
+	 Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	 	       $vmname=$_.BaseName
+		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
+		       }
+	return ($name.ram)
+}
+
+function Read-hdd($name) {
+	 Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	 	       $vmname=$_.BaseName
+		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
+	return ($name.hdd)
+}
+
 function Show-Aliases($pwsalias, $bashalias) {
   Write-Output ""
   Write-Output "powershell alias:"
@@ -578,7 +604,7 @@ function Show-Aliases($pwsalias, $bashalias) {
   Write-Output "  -> restart your shell after applying the above"
 }
 
-function Save-KubeConnfig() {
+function Save-KubeConf() {
   New-Item -itemtype directory -force -path $HOME\.kube | Out-Null
   scp $sshopts $guestuser@master:.kube/config $HOME\.kube\config
 
@@ -715,6 +741,10 @@ switch -regex ($args) {
     New-VHDXTmpl -imageurl $imageurl -srcimg $srcimg -vhdxtmpl $vhdxtmpl
   }
   ^Deploy-Master$ {
+    $name = "master"
+    $cpu=$(Read-cpu -name $name)
+    $ram=$(Read-ram -name $name)
+    $hdd=$(Read-hdd -name $name)
     New-Machine -zwitch $zwitch -vmname 'master' -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
@@ -722,11 +752,18 @@ switch -regex ($args) {
   '(^Deploy-Node(?<number>\d+)$)' {
     $num = [int]$matches.number
     $name = "node$($num)"
+    $cpu=$(Read-cpu -name $name)
+    $ram=$(Read-ram -name $name)
+    $hdd=$(Read-hdd -name $name)
     New-Machine -zwitch $zwitch -vmname $name -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
   }
   ^Save-ISOMaster$ {
+    $name = "master"
+    $cpu=$(Read-cpu -name $name)
+    $ram=$(Read-ram -name $name)
+    $hdd=$(Read-hdd -name $name)
     Write-ISO -zwitch $zwitch -vmname 'master' -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
@@ -734,6 +771,9 @@ switch -regex ($args) {
   '(^Save-ISONode(?<number>\d+)$)' {
     $num = [int]$matches.number
     $name = "node$($num)"
+    $cpu=$(Read-cpu -name $name)
+    $ram=$(Read-ram -name $name)
+    $hdd=$(Read-hdd -name $name)
     Write-ISO -zwitch $zwitch -vmname $name -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
@@ -783,7 +823,7 @@ switch -regex ($args) {
     }
   }
   ^Save-KubeConfig$ {
-    Save-KubeConnfig
+    Save-KubeConf
   }
   ^Restart-K8sVM$ {
     Get-K8sVM | ForEach-Object {
