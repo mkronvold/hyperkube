@@ -1,1 +1,1 @@
-.\hyperv-k8s.ps1 Remove-K8sVM
+.\hyperkube.ps1 Remove-K8sVM

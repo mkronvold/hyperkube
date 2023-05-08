@@ -1,4 +1,4 @@
-.\hyperv-k8s.ps1 Initialize-kubeadm
-.\hyperv-k8s.ps1 Start-KubeadmJoin
-.\hyperv-k8s.ps1 Save-KubeConfig
+.\hyperkube.ps1 Initialize-kubeadm
+.\hyperkube.ps1 Start-KubeadmJoin
+.\hyperkube.ps1 Save-KubeConfig
 

@@ -604,7 +604,7 @@ switch -regex ($args) {
   Practice real Kubernetes configurations on a local multi-node cluster.
   Inspect and optionally customize this script before use.
 
-  Usage: .\hyperv-k8s.ps1 command+
+  Usage: .\hyperkube.ps1 command+
 
   Commands:
 
@@ -842,7 +842,7 @@ switch -regex ($args) {
     Write-Output "(restart your shell after applying the above)"
   }
   default {
-    Write-Output 'invalid command; try: .\hyperv-k8s.ps1 help'
+    Write-Output 'invalid command; try: .\hyperkube.ps1 help'
   }
 }
 

@@ -1,2 +1,2 @@
-.\hyperv-k8s.ps1 Get-Info
+.\hyperkube.ps1 Get-Info
 
