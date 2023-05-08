@@ -41,7 +41,7 @@ $natnet = 'KubeNatNet' # private net nat net name (privnet only)
 $adapter = 'Ethernet' # public net adapter name (pubnet only)
 
 $cpus = 2
-$ram = '2GB'
+$ram = '4GB'
 $hdd = '20GB'
 
 $cidr = switch ($nettype) {
