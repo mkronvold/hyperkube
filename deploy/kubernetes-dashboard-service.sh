@@ -1,9 +1,9 @@
 #!/bin/bash
 
-SRCURL="https://raw.githubusercontent.com/kubernetes/dashboard/v2.3.1/aio/deploy/recommended.yaml"
-SRCNAME=recommended.yaml
+SRCURL="https://raw.githubusercontent.com/mkronvold/hyperv-k8s/main/k8s/kubernetes-dashboard/kubernetes-dashboard-service-np.yaml"
+SRCNAME=kubernetes-dashboard-service-np.yaml
 PATCHNAME=${SRCNAME}.patch
-DEPLOYNAME=kubernetes-dashboard.yaml
+DEPLOYNAME=kubernetes-dashboard-service.yaml
 KUBECTLOPTIONS="--insecure-skip-tls-verify=true"
 
 rm -f $SRCNAME
