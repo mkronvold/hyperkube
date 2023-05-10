@@ -1,0 +1,10 @@
+--- components.yaml	2023-03-21 11:04:03.000000000 -0500
++++ kubernetes-metrics.yaml	2023-05-10 18:41:22.966142700 -0500
+@@ -137,6 +137,7 @@
+         - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+         - --kubelet-use-node-status-port
+         - --metric-resolution=15s
++        - --kubelet-insecure-tls	
+         image: registry.k8s.io/metrics-server/metrics-server:v0.6.3
+         imagePullPolicy: IfNotPresent
+         livenessProbe:
