@@ -1,11 +1,13 @@
 #!/bin/bash
 
-[ "${1}" ] && NAME="${1}" || exit 1
+[ "${1}" ] && CONF="${1}" || exit 1
 
-[ "$SRCURL" ] || exit 1
-[ "$SRCNAME" ] || exit 1
-[ "$PATCHNAME" ] || exit 1
-[ "$DEPLOYNAME" ] || exit 1
+[ -e "$CONF" ] && source $CONF || exit 1
+
+[ "$SRCURL" ]         || exit 1
+[ "$SRCNAME" ]        || exit 1
+[ "$PATCHNAME" ]      || exit 1
+[ "$DEPLOYNAME" ]     || exit 1
 [ "$KUBECTLOPTIONS" ] || exit 1
 
 rm -f $SRCNAME
