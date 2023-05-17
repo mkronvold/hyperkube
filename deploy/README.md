@@ -1,8 +1,8 @@
 
 
 ## kubernetes-dashboard
-deploy.sh 20-kubernetes-dashboard.conf
-deploy.sh 21-kubernetes-dashboard-service.conf
+```deploy.sh 20-kubernetes-dashboard.conf
+deploy.sh 21-kubernetes-dashboard-service.conf```
 
 access at https://127.0.0.1:30002/
 
