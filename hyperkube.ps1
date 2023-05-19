@@ -336,7 +336,7 @@ function New-ISO($vmname) {
   [ISOFile]::Create($isopath, $res.ImageStream, $res.BlockSize, $res.TotalBlocks)
 }
 
-function New-Machine($zwitch, $vmname, $cpu, $mem, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
+function New-Machine($zwitch, $vmname, $cpu, $ram, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
 
@@ -356,7 +356,7 @@ function New-Machine($zwitch, $vmname, $cpu, $mem, $hdd, $vhdxtmpl, $cblock, $ip
 #  }
 
   # Create the VM
-  New-VM -name $vmname -memorystartupbytes $mem -generation $generation `
+  New-VM -name $vmname -memorystartupbytes $ram -generation $generation `
     -switchname $zwitch -vhdpath $vhdx -path $workdir
 
   if ($generation -eq 2) {
@@ -375,7 +375,7 @@ function New-Machine($zwitch, $vmname, $cpu, $mem, $hdd, $vhdxtmpl, $cblock, $ip
 }
 
 # Write ISO file to local machine
-function Write-ISO($zwitch, $vmname, $cpu, $mem, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
+function Write-ISO($zwitch, $vmname, $cpu, $ram, $hdd, $vhdxtmpl, $cblock, $ip, $mac) {
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
   New-Item -itemtype directory -force -path $vmdir | Out-Null
@@ -489,6 +489,10 @@ function Update-HostsFile($cblock) {
 }
 
 
+####### this isn't used ###########
+##                               ##
+###################################
+function New-Nodes($num, $cblock) {
   1..$num | ForEach-Object {
     Write-Output creating node $_
     New-Machine -zwitch $zwitch -vmname "node$_" -cpus 4 -mem 4GB -hdd 40GB `
@@ -567,7 +571,7 @@ function Read-cpu($name) {
 #    Write-Host "Config missing.  Create $conf and try again"
 #    return $False
 #  }  
-	 Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
 	 	       $vmname=$_.BaseName
 		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
 #		       $_.BaseName
@@ -579,7 +583,7 @@ function Read-cpu($name) {
 }
 
 function Read-ram($name) {
-	 Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
 	 	       $vmname=$_.BaseName
 		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
 		       }
@@ -587,9 +591,10 @@ function Read-ram($name) {
 }
 
 function Read-hdd($name) {
-	 Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
 	 	       $vmname=$_.BaseName
 		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
+		       }
 	return ($name.hdd)
 }
 
