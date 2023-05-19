@@ -566,36 +566,31 @@ function Convert-UNCPath2($path) {
 }
 
 function Read-cpu($name) {
-#  $conf = "config\$vmname.conf"
-#  if (!(Test-Path $conf)) {
-#    Write-Host "Config missing.  Create $conf and try again"
-#    return $False
-#  }  
-	Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
-	 	       $vmname=$_.BaseName
-		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
-#		       $_.BaseName
-#		       $vmname.cpu
-#		       $vmname.ram
-#		       $vmname.hdd
-		       }
-	return ($name.cpu)
+#      if (!(Test-Path $conf)) {
+#          Write-Host "Config missing.  Create $conf and try again"
+#          return $False
+#      }
+	Get-ChildItem -Path .\$name.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	    $vmname=$_.BaseName
+	    $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
+	}
+      return ($vmname.cpu)
 }
 
 function Read-ram($name) {
-	Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
-	 	       $vmname=$_.BaseName
-		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
-		       }
-	return ($name.ram)
+	Get-ChildItem -Path .\$name.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	    $vmname=$_.BaseName
+	    $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
+	}
+return ($vmname.ram)
 }
 
 function Read-hdd($name) {
-	Get-ChildItem -Path .\ -Filter *.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
-	 	       $vmname=$_.BaseName
-		       $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
-		       }
-	return ($name.hdd)
+	Get-ChildItem -Path .\$name.conf -Recurse -File| Sort-Object Length -Descending | ForEach-Object {
+	    $vmname=$_.BaseName
+	    $vmname = Get-Content $_.FullName | Out-String | ConvertFrom-StringData
+	}
+return ($vmname.hdd)
 }
 
 function Show-Aliases($pwsalias, $bashalias) {
@@ -750,6 +745,10 @@ switch -regex ($args) {
     $cpu=$(Read-cpu -name $name)
     $ram=$(Read-ram -name $name)
     $hdd=$(Read-hdd -name $name)
+    write-host "name = $name"
+    write-host "cpu = $cpu"
+    write-host "ram = $ram"
+    write-host "hdd = $hdd"
     New-Machine -zwitch $zwitch -vmname 'master' -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
@@ -760,6 +759,10 @@ switch -regex ($args) {
     $cpu=$(Read-cpu -name $name)
     $ram=$(Read-ram -name $name)
     $hdd=$(Read-hdd -name $name)
+    write-host "name = $name"
+    write-host "cpu = $cpu"
+    write-host "ram = $ram"
+    write-host "hdd = $hdd"
     New-Machine -zwitch $zwitch -vmname $name -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
@@ -769,6 +772,10 @@ switch -regex ($args) {
     $cpu=$(Read-cpu -name $name)
     $ram=$(Read-ram -name $name)
     $hdd=$(Read-hdd -name $name)
+    write-host "name = $name"
+    write-host "cpu = $cpu"
+    write-host "ram = $ram"
+    write-host "hdd = $hdd"
     Write-ISO -zwitch $zwitch -vmname 'master' -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
@@ -779,6 +786,10 @@ switch -regex ($args) {
     $cpu=$(Read-cpu -name $name)
     $ram=$(Read-ram -name $name)
     $hdd=$(Read-hdd -name $name)
+    write-host "name = $name"
+    write-host "cpu = $cpu"
+    write-host "ram = $ram"
+    write-host "hdd = $hdd"
     Write-ISO -zwitch $zwitch -vmname $name -cpus $cpu `
       -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
