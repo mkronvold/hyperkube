@@ -340,6 +340,11 @@ function New-Machine($zwitch, $vmname, $cpu, $ram, $hdd, $vhdxtmpl, $cblock, $ip
   $vmdir = "$workdir\$vmname"
   $vhdx = "$workdir\$vmname\$vmname.vhdx"
 
+  # write-host "name = $name"
+  # write-host "cpu = $cpu"
+  # write-host "ram = $ram"
+  # write-host "hdd = $hdd"
+
   if (!(Test-Path $vmdir)) {
     New-Item -itemtype directory -force -path $vmdir | Out-Null
   }
@@ -495,7 +500,7 @@ function Update-HostsFile($cblock) {
 function New-Nodes($num, $cblock) {
   1..$num | ForEach-Object {
     Write-Output creating node $_
-    New-Machine -zwitch $zwitch -vmname "node$_" -cpus 4 -mem 4GB -hdd 40GB `
+    New-Machine -zwitch $zwitch -vmname "node$_" -cpu 4 -ram 4GB -hdd 40GB `
       -vhdxtmpl $vhdxtmpl -cblock $cblock -ip $(10 + $_)
   }
 }
@@ -709,7 +714,7 @@ switch -regex ($args) {
       'private' { Write-Output "    natnet: $natnet" }
       'public' { Write-Output "   adapter: $adapter" }
     }
-    Write-Output "      cpus: $cpu"
+    Write-Output "       cpu: $cpu"
     Write-Output "       ram: $ram"
     Write-Output "       hdd: $hdd"
     Write-Output "       cni: $cni"
@@ -749,8 +754,8 @@ switch -regex ($args) {
     write-host "cpu = $cpu"
     write-host "ram = $ram"
     write-host "hdd = $hdd"
-    New-Machine -zwitch $zwitch -vmname 'master' -cpus $cpu `
-      -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
+    New-Machine -zwitch $zwitch -vmname 'master' -cpu $cpu `
+      -ram $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
   }
   '(^Deploy-Node(?<number>\d+)$)' {
@@ -759,12 +764,12 @@ switch -regex ($args) {
     $cpu=$(Read-cpu -name $name)
     $ram=$(Read-ram -name $name)
     $hdd=$(Read-hdd -name $name)
-    write-host "name = $name"
-    write-host "cpu = $cpu"
-    write-host "ram = $ram"
-    write-host "hdd = $hdd"
-    New-Machine -zwitch $zwitch -vmname $name -cpus $cpu `
-      -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
+    # write-host "name = $name"
+    # write-host "cpu = $cpu"
+    # write-host "ram = $ram"
+    # write-host "hdd = $hdd"
+    New-Machine -zwitch $zwitch -vmname $name -cpu $cpu `
+      -ram $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
   }
   ^Save-ISOMaster$ {
@@ -772,12 +777,12 @@ switch -regex ($args) {
     $cpu=$(Read-cpu -name $name)
     $ram=$(Read-ram -name $name)
     $hdd=$(Read-hdd -name $name)
-    write-host "name = $name"
-    write-host "cpu = $cpu"
-    write-host "ram = $ram"
-    write-host "hdd = $hdd"
-    Write-ISO -zwitch $zwitch -vmname 'master' -cpus $cpu `
-      -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
+    # write-host "name = $name"
+    # write-host "cpu = $cpu"
+    # write-host "ram = $ram"
+    # write-host "hdd = $hdd"
+    Write-ISO -zwitch $zwitch -vmname 'master' -cpu $cpu `
+      ram $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip '10' -mac $macs[0]
   }
   '(^Save-ISONode(?<number>\d+)$)' {
@@ -786,12 +791,12 @@ switch -regex ($args) {
     $cpu=$(Read-cpu -name $name)
     $ram=$(Read-ram -name $name)
     $hdd=$(Read-hdd -name $name)
-    write-host "name = $name"
-    write-host "cpu = $cpu"
-    write-host "ram = $ram"
-    write-host "hdd = $hdd"
-    Write-ISO -zwitch $zwitch -vmname $name -cpus $cpu `
-      -mem $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
+    # write-host "name = $name"
+    # write-host "cpu = $cpu"
+    # write-host "ram = $ram"
+    # write-host "hdd = $hdd"
+    Write-ISO -zwitch $zwitch -vmname $name -cpu $cpu `
+      -ram $(Invoke-Expression $ram) -hdd $(Invoke-Expression $hdd) `
       -vhdxtmpl $vhdxtmpl -cblock $cidr -ip "$($num + 10)" -mac $macs[$num]
   }
   ^Get-Info$ {
