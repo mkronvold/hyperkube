@@ -653,12 +653,13 @@ switch -regex ($args) {
     Deploy-HostsFile - Append private network node names to etc/hosts
            Get-Image - Download the VM image
        Deploy-Master - Create and launch master node
-        Deploy-NodeN - Create and launch worker node (node1, node2, ...)
+        Deploy-NodeN - Create and launch worker (node1, node2, ...)
       Save-ISOMaster - Save master node iso
-       Save-ISONodeN - Save worker node iso (node1, node2, ...)
+       Save-ISONodeN - Save worker node iso for (node1, node2, ...)
             Get-Info - Display info about nodes
   Initialize-Kubeadm - Initialize kubeadm
    Start-KubeadmJoin - Run Kubeadm join command
+    KubeadmJoinNodeN - Run Kubeadm join command on (node1, node2, ...)
      Save-KubeConfig - Save Kube config to host
           Save-K8sVM - Snapshot the VMs
        Restore-K8sVM - Restore VMs from latest snapshots
@@ -841,6 +842,17 @@ switch -regex ($args) {
           exit 1
         }
       }
+    }
+  }
+  '(^KubeadmJoinNode(?<number>\d+)$)' {
+    $num = [int]$matches.number
+    $node = "node$($num)"
+    $joincmd = $(ssh $sshopts $guestuser@master 'sudo kubeadm token create --print-join-command')
+    Write-Output "`nexecuting on $node`: $joincmd"
+    ssh $sshopts $guestuser@$node sudo $joincmd
+    if (!$?) {
+      Write-Output "$node init has failed, aborting"
+      exit 1
     }
   }
   ^Save-KubeConfig$ {
