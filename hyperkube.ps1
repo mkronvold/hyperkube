@@ -1,5 +1,6 @@
-$version = 'v1.0.3'
-$workdir = "$HOME\hyperkube"
+$version = 'v1.1.0'
+# This must be configured to where everything is and where everything will go, including VM disks and config.
+$workdir = "$HOME\hyperkube"    
 # $guestuser = $env:USERNAME.ToLower()
 $guestuser = 'administrator'
 $sshpath = "$HOME\.ssh\id_rsa.pub"
